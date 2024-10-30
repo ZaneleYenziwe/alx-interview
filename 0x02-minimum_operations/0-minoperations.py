@@ -1,41 +1,25 @@
-#!/usr/bin/python3
-# 0x02. Minimum Operations
+#!/usr/bin/python
+def minOperations(n):
+    """
+    Calculate the minimum number of operations (Copy All and Paste)
+    needed to result in exactly n 'H' characters in a text file.
 
-## Tasks
-### [0. Minimum Operations](./0-minoperations.py)
-In a text file, there is a single character `H`. Your text editor can execute only two operations in this file: `Copy All` and `Paste`. Given a number `n`, write a method that calculates the fewest number of operations needed to result in exactly n `H` characters in the file.
+    Args:
+    n (int): The target number of 'H' characters.
 
-- Prototype: `def minOperations(n)`
-- Returns an integer
-- If `n` is impossible to achieve, return `0`
+    Returns:
+    int: The minimum number of operations. If n is impossible to achieve, return 0.
+    """
+    if n < 1:
+        return 0
 
-**Example:**
+    dp = [0] * (n + 1)
+    for i in range(2, n + 1):
+        dp[i] = i  # Initialize with the maximum possible operations (i.e., Paste i times)
+        for j in range(2, int(i ** 0.5) + 1):
+            if i % j == 0:
+                dp[i] = min(dp[i], dp[j] + i // j + 1)
+                break
 
-`n = 9`
+    return dp[n]
 
-`H` => `Copy All` => `Paste` => `HH` => `Paste` =>`HHH` => `Copy All` => `Paste` => `HHHHHH` => `Paste` => `HHHHHHHHH`
-
-Number of operations: `6`
-```bash
-carrie@ubuntu:~/0x02-minoperations$ cat 0-main.py
-#!/usr/bin/python3
-"""
-Main file for testing
-"""
-
-minOperations = __import__('0-minoperations').minOperations
-
-n = 4
-print("Min # of operations to reach {} char: {}".format(n, minOperations(n)))
-
-n = 12
-print("Min # of operations to reach {} char: {}".format(n, minOperations(n)))
-
-carrie@ubuntu:~/0x02-minoperations$
-```
-```bash
-carrie@ubuntu:~/0x02-minoperations$ ./0-main.py
-Min number of operations to reach 4 characters: 4
-Min number of operations to reach 12 characters: 7
-carrie@ubuntu:~/0x02-minoperations$
-```
