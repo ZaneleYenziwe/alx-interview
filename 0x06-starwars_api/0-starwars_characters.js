@@ -1,24 +1,27 @@
 const request = require('request');
-
 const movieId = process.argv[2];
-const url = `(link unavailable);
 
-request.get(url, (error, response, body) => {
-    if (error) {
-        console.error(error);
+if (!movieId) {
+    console.log('Usage: node 0-starwars_characters.js <movie_id>');
+    process.exit(1);
+}
+
+const url = `https://swapi.dev/api/films/${movieId}/`;
+
+request(url, { json: true }, (err, res, body) => {
+    if (err || res.statusCode !== 200) {
+        console.log('Failed to retrieve data');
         return;
     }
 
-    const data = JSON.parse(body);
-    data.characters.forEach(character => {
-        request.get(character, (err, res, charBody) => {
-            if (err) {
-                console.error(err);
+    const characters = body.characters;
+    characters.forEach(characterUrl => {
+        request(characterUrl, { json: true }, (err, res, characterBody) => {
+            if (err || res.statusCode !== 200) {
+                console.log('Failed to retrieve character data');
                 return;
             }
-
-            const charData = JSON.parse(charBody);
-            console.log(charData.name);
+            console.log(characterBody.name);
         });
     });
 });
