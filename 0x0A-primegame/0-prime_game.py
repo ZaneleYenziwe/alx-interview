@@ -1,35 +1,58 @@
-def isWinner(x, nums):
-    def sieve(n):
-        is_prime = [True] * (n + 1)
-        p = 2
-        while p ** 2 <= n:
-            if is_prime[p]:
-                for i in range(p ** 2, n + 1, p):
-                    is_prime[i] = False
-            p += 1
-        prime_numbers = [p for p in range(2, n + 1) if is_prime[p]]
-        return prime_numbers
+#!/usr/bin/python3
+"""
+Prime Game
+"""
 
-    def play_game(n):
-        primes = sieve(n)
-        primes_set = set(primes)
-        multiples_removed = [0] * (n + 1)
+def sieve(n):
+    """Returns a list of prime numbers up to n."""
+    is_prime = [True] * (n + 1)
+    is_prime[0] = is_prime[1] = False
+    for p in range(2, int(n**0.5) + 1):
+        if is_prime[p]:
+            for multiple in range(p * p, n + 1, p):
+                is_prime[multiple] = False
+    return [p for p in range(n + 1) if is_prime[p]]
+
+def play_game(n, primes):
+    """Simulates the game and returns the winner for a given n."""
+    set_nums = set(range(1, n + 1))
+    turn = 0  # Maria starts first
+    while True:
+        prime_picked = False
         for prime in primes:
-            for multiple in range(prime, n + 1, prime):
-                multiples_removed[multiple] = 1
-        return sum(multiples_removed) % 2 == 0
+            if prime in set_nums:
+                prime_picked = True
+                set_nums -= set(range(prime, n + 1, prime))
+                break
+        if not prime_picked:
+            return "Maria" if turn % 2 == 1 else "Ben"
+        turn += 1
 
+def isWinner(x, nums):
+    """Determines the winner of each game."""
+    if x < 1 or not nums:
+        return None
+
+    max_n = max(nums)
+    primes = sieve(max_n)
     maria_wins = 0
     ben_wins = 0
-    for num in nums:
-        if play_game(num):
+
+    for n in nums:
+        winner = play_game(n, primes)
+        if winner == "Maria":
             maria_wins += 1
         else:
             ben_wins += 1
-    
+
     if maria_wins > ben_wins:
         return "Maria"
     elif ben_wins > maria_wins:
         return "Ben"
     else:
         return None
+
+# Example usage:
+if __name__ == "__main__":
+    print(isWinner(3, [4, 5, 1]))  # Output: Ben
+
